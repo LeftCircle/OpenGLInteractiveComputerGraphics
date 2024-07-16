@@ -18,8 +18,16 @@
     <ClCompile Include="..\include\InitShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="example3.cpp">
+    <ClCompile Include="..\chapter_02\example3.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\chapter_02\fshader23.glsl">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="..\chapter_02\vshader23.glsl">
+      <Filter>Source Files</Filter>
+    </None>
   </ItemGroup>
 </Project>
