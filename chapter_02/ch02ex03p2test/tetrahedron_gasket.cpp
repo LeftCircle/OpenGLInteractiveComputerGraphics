@@ -5,23 +5,34 @@ const int n_tetrahedrons = 1024; // 4^5 tetrahedrons
 const int n_triangles = 4 * n_tetrahedrons;
 const int n_points = 3 * n_triangles;
 vec3 points[n_points];
+vec3 colors[n_points]; // A color for each vertex
 int index = 0;
+int color_index = 0;
 
 void triangle(const vec3 &a, const vec3 &b, const vec3 &c)
 {
+	static vec3 base_colors[] = {vec3(1.0, 0.0, 0.0), vec3(0.0, 1.0, 0.0), vec3(0.0, 0.0, 1.0), vec3(0.0)};
+
 	points[index] = a;
+	colors[index] = base_colors[color_index];
 	index++;
 	points[index] = b;
+	colors[index] = base_colors[color_index];
 	index++;
 	points[index] = c;
+	colors[index] = base_colors[color_index];
 	index++;
 }
 
 void tetra(const vec3& a, const vec3& b, const vec3& c, const vec3& d)
 {
+	color_index = 0;
 	triangle(a, b, c);
+	color_index = 1;
 	triangle(a, c, d);
+	color_index = 2;
 	triangle(a, d, b);
+	color_index = 3;
 	triangle(b, d, c);
 }
 
@@ -49,10 +60,10 @@ void divide_tetra(const vec3& a, const vec3& b, const vec3& c, const vec3& d, in
 
 void init(void) {
 	vec3 vertices[] = {
-		vec3(-0.5, -0.5, -0.5),
-		vec3(0.5, -0.5, -0.5),
-		vec3(0.0, 0.5, 0.0),
-		vec3(0.0, -0.5, 0.5)
+		vec3(0.0, 0.0, -1.0),
+		vec3(0.0, 0.942809, 0.333333),
+		vec3(-0.816497, -0.471405, 0.333333),
+		vec3(0.816497, -0.471405, 0.333333)
 	};
 
 	divide_tetra(vertices[0], vertices[1], vertices[2], vertices[3], n_divisions);
@@ -66,7 +77,11 @@ void init(void) {
 	GLuint buffer;
 	glGenBuffers(1, &buffer);
 	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(points), points, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(points) + sizeof(colors), points, GL_STATIC_DRAW);
+
+	// Break up the buffers to designate the colors vs verteices
+	glBufferSubData(GL_ARRAY_BUFFER, 0, sizeof(points), points);
+	glBufferSubData(GL_ARRAY_BUFFER, sizeof(points), sizeof(colors), colors);
 
 	// Load shaders and use the resulting shader program
 	GLuint program = InitShader("vshader24.glsl", "fshader24.glsl");
@@ -77,11 +92,18 @@ void init(void) {
 	glEnableVertexAttribArray(loc);
 	glVertexAttribPointer(loc, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(0));
 
+	// Initialize the vertex color attribute from the vertex shader
+	GLuint color_loc = glGetAttribLocation(program, "vColor");
+	glEnableVertexAttribArray(color_loc);
+	glVertexAttribPointer(color_loc, 3, GL_FLOAT, GL_FALSE, 0, BUFFER_OFFSET(sizeof(points)));
+
+	glEnable(GL_DEPTH_TEST);
+
 	glClearColor(1.0, 1.0, 1.0, 1.0); // white background
 }
 
 void display(void) {
-	glClear(GL_COLOR_BUFFER_BIT);     // clear the window
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);     // clear the window
 	glDrawArrays(GL_TRIANGLES, 0, n_points);    // draw the points
 	glFlush();
 }
@@ -97,7 +119,7 @@ void keyboard(unsigned char key, int x, int y) {
 
 int main(int argc, char** argv) {
 	glutInit(&argc, argv);
-	glutInitDisplayMode(GLUT_RGBA);
+	glutInitDisplayMode(GLUT_RGBA | GLUT_DEPTH);
 	glutCreateWindow("tetrahedron Gasket");
 	glewInit();
 	init();

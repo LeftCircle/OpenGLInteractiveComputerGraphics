@@ -15,15 +15,15 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="tetrahedron_gasket.cpp">
+    <ClCompile Include="..\..\..\..\..\..\Programming\OpenGL\OpenGLInteractiveComputerGraphics\include\InitShader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\include\InitShader.cpp">
+    <ClCompile Include="recursive_3d_gasket.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <None Include="fshader24.glsl" />
-    <None Include="vshader24.glsl" />
+    <None Include="vshader24b.glsl" />
+    <None Include="fshader24b.glsl" />
   </ItemGroup>
 </Project>
